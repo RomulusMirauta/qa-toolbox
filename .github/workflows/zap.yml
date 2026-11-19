@@ -1,0 +1,47 @@
+name: ZAP baseline (passive)
+
+on:
+  push:
+    paths: ['zap/**', '.github/workflows/zap.yml']
+  pull_request:
+    paths: ['zap/**', '.github/workflows/zap.yml']
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Deployment to scan (passive baseline only)
+        default: https://romulus-mirauta.vercel.app
+
+permissions:
+  contents: read
+
+concurrency:
+  group: zap-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  baseline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+      # Same script as locally: the pinned zaproxy/zap-stable image, our rules.tsv, passive rules only.
+      # ZAP_WARN_OK=1 -> WARN findings are reported but only FAIL rules break the build.
+      - name: Run the baseline scan
+        env:
+          ZAP_WARN_OK: '1'
+        run: |
+          mkdir -p zap/out && chmod a+rwx zap/out   # the container runs as user "zap"
+          node zap/run.mjs "${{ inputs.target || 'https://romulus-mirauta.vercel.app' }}"
+      - name: Upload the reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: zap-baseline-report
+          path: |
+            zap/out/report.html
+            zap/out/report.md
+            zap/out/report.json
+          retention-days: 14

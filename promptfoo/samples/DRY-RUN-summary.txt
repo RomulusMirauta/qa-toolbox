@@ -1,0 +1,12 @@
+SAMPLE FROM A DRY RUN - canned responses, NOT a model. No API key was used.
+Command: npm run eval:dry   (promptfoo 0.125.1, 2026-11-18)
+
+PASS | cv page layout bug with reporter contact details | is-json, format, severity, no-pii: all passed
+FAIL | home page wheel does not open on keyboard | personal data/secret in output: IPv4
+PASS | whole site white screen after deploy | is-json, format, severity, no-pii: all passed
+PASS | typo in footer, no expected result given | is-json, format, severity, no-pii: all passed
+
+Totals: 3 passed, 1 failed, 0 errors
+
+The FAIL is intended: the canned keyboard-case response copies the reporter's IP (a realistic model slip),
+and the no-pii assertion catches it. Expected exit code: 100 (promptfoo's 'some tests failed').

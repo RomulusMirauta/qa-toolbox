@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+# DRY RUN: no model, no API key. A canned-response provider replays fixed outputs so the prompt
+# rendering and every deterministic assertion run for real. It proves the *harness*, not a model.
+# Run: npm run eval:dry
+description: QA bug-report summariser (DRY RUN - canned responses, not a model)
+prompts:
+  - file://prompts/bug-summary.txt
+providers:
+  - id: file://providers/canned.cjs
+    label: canned-responses (dry run)
+defaultTest:
+  assert:
+    - type: is-json
+    - type: javascript # format: exact keys in order, title <= 80 chars, 1-8 steps
+      value: file://assert/format.cjs
+    - type: javascript # severity present, allowed, inside the band the case expects
+      value: file://assert/severity.cjs
+    - type: javascript # no personal data or secrets copied from the input
+      value: file://assert/no-pii.cjs
+tests: file://tests.yaml

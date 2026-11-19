@@ -1,0 +1,20 @@
+# dependencies and local tools
+node_modules/
+.tools/
+
+# run outputs (curated, small copies live in <module>/samples/)
+k6/out/
+zap/out/
+docker/out/
+docker/*.log
+promptfoo/out/
+test-agents/playwright-report/
+test-agents/test-results/
+
+# secrets: never commit keys
+.env
+.env.*
+*.key
+
+# Not published; promptfoo is pinned to an exact version in package.json
+promptfoo/package-lock.json

@@ -1,0 +1,43 @@
+name: k6 smoke performance
+
+on:
+  push:
+    paths: ['k6/**', '.github/workflows/k6.yml']
+  pull_request:
+    paths: ['k6/**', '.github/workflows/k6.yml']
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: Deployment to test
+        default: https://romulus-mirauta.vercel.app
+
+permissions:
+  contents: read
+
+concurrency:
+  group: k6-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: grafana/setup-k6-action@c47136d33d365efbeb9ae7266908b5dcf98cdece # v1.3.0
+        with:
+          k6-version: '2.4.0'
+      - name: Run the smoke test (5 VUs max, under 1 minute)
+        env:
+          BASE_URL: ${{ inputs.base_url || 'https://romulus-mirauta.vercel.app' }}
+          OUT_DIR: k6/out
+        run: |
+          mkdir -p k6/out
+          k6 run --quiet k6/smoke.js
+      - name: Upload the summary
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: k6-summary
+          path: k6/out/
+          retention-days: 14

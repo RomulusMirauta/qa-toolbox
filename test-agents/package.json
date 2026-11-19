@@ -1,0 +1,16 @@
+{
+  "name": "qa-toolbox-test-agents",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Playwright Test Agents (planner / generator / healer) set up against a public site, with human review.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "init-agents": "playwright init-agents --loop=claude",
+    "test": "playwright test",
+    "test:seed": "playwright test tests/seed.spec.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.0"
+  }
+}

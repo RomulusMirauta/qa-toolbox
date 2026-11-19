@@ -1,0 +1,30 @@
+# ZAP baseline rules for the target app (a public, static, cookie-less site on a CDN).
+# Format: <plugin id> <TAB> <IGNORE|INFO|WARN|FAIL> <TAB> (<rule name / reason>)
+# Rules not listed keep the baseline default (WARN). Every IGNORE/INFO has a reason; review them yearly.
+#
+# --- Regressions that must fail the build (all PASS today) ---
+10020	FAIL	(Anti-clickjacking Header: CSP frame-ancestors 'none' is set; losing it is a regression)
+10035	FAIL	(Strict-Transport-Security Header: HSTS is set; losing it is a regression)
+10038	FAIL	(Content Security Policy Header Not Set: a CSP is set; losing it is a regression)
+10037	FAIL	(X-Powered-By leak: must stay absent)
+10062	FAIL	(PII Disclosure: the app must never expose personal data such as card numbers)
+10115	FAIL	(Script served from a known malicious domain)
+2	FAIL	(Private IP Disclosure)
+#
+# --- Accepted risks (real, documented, tracked) ---
+10055	WARN	(CSP: 'unsafe-inline' for script/style: needed by the static export's inline bootstrap; tracked as a hardening item)
+90003	WARN	(SRI missing on the third-party analytics script: the vendor serves an unversioned file, so SRI would break on update; tracked)
+#
+# --- Platform-owned files (served by the hosting platform, not by the app) ---
+10021	INFO	(X-Content-Type-Options missing only on the platform's analytics script, not on app pages)
+10063	INFO	(Permissions-Policy missing only on the platform's analytics script, not on app pages)
+#
+# --- False positives for this kind of target ---
+10017	IGNORE	(Cross-domain JS: the one external script is the privacy-friendly analytics counter, allow-listed in the CSP)
+10098	IGNORE	(Access-Control-Allow-Origin: * on public, credential-less static files is the CDN default and leaks nothing)
+90004	IGNORE	(COEP/COOP: the app uses no cross-origin isolation features (SharedArrayBuffer etc.); nothing to isolate)
+10109	IGNORE	(Modern Web Application: informational, tells the spider to use AJAX; not a finding)
+10049	IGNORE	(Content cacheability: informational; caching is intended for a static site)
+10050	IGNORE	(Retrieved from cache: informational; CDN caching is intended)
+10015	IGNORE	(Re-examine Cache-control: HTML uses max-age=0,must-revalidate on purpose so deploys are visible at once)
+10116	IGNORE	(ZAP is out of date: tool notice, not an app finding; the image version is pinned on purpose)

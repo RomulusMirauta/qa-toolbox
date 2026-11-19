@@ -1,0 +1,30 @@
+# Real output, 2026-11-18, Windows 11, Node v26.4.0, @playwright/test 1.65.0
+
+$ npx playwright init-agents --loop=claude
+ 🎭 Using project "chromium" as a primary project
+ 🤖 .claude\agents\playwright-test-generator.md - agent definition
+ 🤖 .claude\agents\playwright-test-healer.md - agent definition
+ 🤖 .claude\agents\playwright-test-planner.md - agent definition
+ 🔧 .mcp.json - mcp configuration
+ ✅ Done.
+
+$ node probe-mcp.mjs
+server: Playwright Test Runner 1.65.0
+tools: 92 (83 browser_* + agent tools below)
+agent tools: planner_save_plan, planner_setup_page, planner_submit_plan, generator_setup_page, generator_read_log, generator_write_test, test_list, test_run, test_debug
+
+$ npx playwright test
+Running 2 tests using 2 workers
+  -  1 [chromium] › tests\healer-input.spec.ts:15:1 › cv page shows the name and the work history section
+  ok 2 [chromium] › tests\seed.spec.ts:9:1 › seed (781ms)
+  1 skipped
+  1 passed (1.9s)
+
+$ HEALER_DEMO=1 npx playwright test tests/healer-input.spec.ts   # the healer input fails as intended
+[1/1] [chromium] › tests\healer-input.spec.ts:15:1 › cv page shows the name and the work history section
+  1) [chromium] › tests\healer-input.spec.ts:15:1 › cv page shows the name and the work history section 
+    Error: expect(locator).toHaveText(expected) failed
+    Locator: locator('.vSHQBG_name_old')
+    Error: element(s) not found
+  1 failed
+    [chromium] › tests\healer-input.spec.ts:15:1 › cv page shows the name and the work history section 

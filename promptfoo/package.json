@@ -1,0 +1,16 @@
+{
+  "name": "qa-toolbox-promptfoo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tiny promptfoo eval: a QA bug-report summariser prompt with format, PII and severity assertions.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "eval": "promptfoo eval -c promptfooconfig.yaml --no-cache --no-share -o out/results.json -o out/results.html",
+    "eval:dry": "promptfoo eval -c promptfooconfig.dry.yaml --no-cache --no-share -o out/dry-results.json -o out/dry-results.html",
+    "view": "promptfoo view"
+  },
+  "devDependencies": {
+    "promptfoo": "0.125.1"
+  }
+}

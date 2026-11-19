@@ -1,0 +1,27 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>k6 smoke summary</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>body{font:14px/1.5 system-ui,sans-serif;margin:24px;color:#1b1f24;background:#fff}
+table{border-collapse:collapse;width:100%}td,th{border:1px solid #d0d7de;padding:4px 8px;text-align:left;vertical-align:top}
+.ok{color:#1a7f37}.bad{color:#cf222e;font-weight:600}code{font-size:13px}</style></head><body>
+<h1>k6 smoke summary &mdash; <span class="ok">all thresholds passed</span></h1>
+<p>Target: <code>https://romulus-mirauta.vercel.app</code> &middot; generated 2026-11-18T00:22:01.601Z</p>
+<table><thead><tr><th>metric</th><th>type</th><th>values</th><th>thresholds</th></tr></thead><tbody>
+<tr><td><code>group_duration</code></td><td>trend</td><td>min=40.24 &middot; med=75.42 &middot; avg=71.65 &middot; p(90)=98.03 &middot; p(95)=104.83 &middot; max=216.79</td><td></td></tr>
+<tr><td><code>http_req_receiving</code></td><td>trend</td><td>min=0 &middot; med=17.67 &middot; avg=20.45 &middot; p(90)=47.06 &middot; p(95)=48.62 &middot; max=58.51</td><td></td></tr>
+<tr><td><code>http_req_blocked</code></td><td>trend</td><td>avg=3.35 &middot; p(90)=0 &middot; p(95)=0 &middot; max=113.88 &middot; min=0 &middot; med=0</td><td></td></tr>
+<tr><td><code>http_req_connecting</code></td><td>trend</td><td>p(95)=0 &middot; max=16.39 &middot; min=0 &middot; med=0 &middot; avg=0.51 &middot; p(90)=0</td><td></td></tr>
+<tr><td><code>http_req_duration{expected_response:true}</code></td><td>trend</td><td>max=124.41 &middot; min=40.24 &middot; med=74.65 &middot; avg=67.96 &middot; p(90)=96.94 &middot; p(95)=101.24</td><td></td></tr>
+<tr><td><code>http_req_tls_handshaking</code></td><td>trend</td><td>avg=2.76 &middot; p(90)=0 &middot; p(95)=0 &middot; max=90.41 &middot; min=0 &middot; med=0</td><td></td></tr>
+<tr><td><code>iterations</code></td><td>counter</td><td>count=34 &middot; rate=0.66</td><td></td></tr>
+<tr><td><code>http_req_duration</code></td><td>trend</td><td>p(90)=96.94 &middot; p(95)=101.24 &middot; max=124.41 &middot; min=40.24 &middot; med=74.65 &middot; avg=67.96</td><td><span class="ok">p(95)<1000 PASS</span></td></tr>
+<tr><td><code>http_req_failed</code></td><td>rate</td><td>rate=0 &middot; passes=0 &middot; fails=136</td><td><span class="ok">rate<0.01 PASS</span></td></tr>
+<tr><td><code>data_sent</code></td><td>counter</td><td>count=88611 &middot; rate=1713.47</td><td></td></tr>
+<tr><td><code>data_received</code></td><td>counter</td><td>count=26942998 &middot; rate=520995.84</td><td></td></tr>
+<tr><td><code>iteration_duration</code></td><td>trend</td><td>min=4980.27 &middot; med=6422.27 &middot; avg=6314.58 &middot; p(90)=6984.68 &middot; p(95)=7100.93 &middot; max=7244.77</td><td></td></tr>
+<tr><td><code>http_reqs</code></td><td>counter</td><td>count=136 &middot; rate=2.63</td><td></td></tr>
+<tr><td><code>http_req_waiting</code></td><td>trend</td><td>p(95)=59.43 &middot; max=89.32 &middot; min=39.16 &middot; med=45.53 &middot; avg=47.5 &middot; p(90)=55.56</td><td></td></tr>
+<tr><td><code>checks</code></td><td>rate</td><td>rate=1 &middot; passes=408 &middot; fails=0</td><td></td></tr>
+<tr><td><code>http_req_duration{kind:page}</code></td><td>trend</td><td>p(90)=101.28 &middot; p(95)=105.09 &middot; max=124.41 &middot; min=74.31 &middot; med=84.05 &middot; avg=88.28</td><td><span class="ok">p(95)<800 PASS</span></td></tr>
+<tr><td><code>http_req_sending</code></td><td>trend</td><td>min=0 &middot; med=0 &middot; avg=0 &middot; p(90)=0 &middot; p(95)=0 &middot; max=0.58</td><td></td></tr>
+<tr><td><code>check_failures</code></td><td>rate</td><td>rate=0 &middot; passes=0 &middot; fails=136</td><td><span class="ok">rate<0.01 PASS</span></td></tr>
+</tbody></table></body></html>

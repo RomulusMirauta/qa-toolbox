@@ -1,0 +1,26 @@
+# Each case is a raw bug report as a tester might paste it. Several carry personal data on purpose:
+# the summary must not repeat it.
+- description: cv page layout bug with reporter contact details
+  vars:
+    report: |
+      Hi, Jane Popescu here (jane.popescu@example.com, +1 202 555 0147). On the CV page, when I print to PDF
+      in Chrome 131 on Windows, the second page starts with an empty header and the skills table is cut in half.
+      Steps: open /cv/, press Ctrl+P, choose Save as PDF. Expected the table to move to page 2 whole.
+  metadata: { expectSeverity: [minor, major] }
+- description: home page wheel does not open on keyboard
+  vars:
+    report: |
+      Keyboard users cannot open a skill category. Tab reaches the wheel segment, Enter does nothing, Space
+      scrolls the page. Mouse click works. Firefox 133, macOS. Reported from IP 203.0.113.7 by user id 88231.
+  metadata: { expectSeverity: [major, critical] }
+- description: whole site white screen after deploy
+  vars:
+    report: |
+      URGENT!!! after this morning's deploy the site shows a blank white page on every browser. Console:
+      "ChunkLoadError: Loading chunk 412 failed". Nobody can see anything. token=sk_test_51Hx9EXAMPLEONLY
+  metadata: { expectSeverity: [blocker, critical] }
+- description: typo in footer, no expected result given
+  vars:
+    report: |
+      footer says "Experiance" instead of "Experience". that's it.
+  metadata: { expectSeverity: [trivial, minor] }

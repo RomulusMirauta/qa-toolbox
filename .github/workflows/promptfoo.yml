@@ -1,0 +1,45 @@
+name: promptfoo eval
+
+on:
+  push:
+    paths: ['promptfoo/**', '.github/workflows/promptfoo.yml']
+  pull_request:
+    paths: ['promptfoo/**', '.github/workflows/promptfoo.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  eval:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: promptfoo
+    env:
+      PROMPTFOO_DISABLE_TELEMETRY: '1'
+      PROMPTFOO_DISABLE_UPDATE: '1'
+      # Only from repository secrets; never written to a file. Empty on forks and when not configured.
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+      # promptfoo/package-lock.json is not published; promptfoo is pinned to an exact version in package.json
+      - run: npm install --no-audit --no-fund
+      - name: Dry run (canned responses, no model)
+        run: |
+          npm run eval:dry || true   # exit 100 is expected: one planted leak must fail
+          node check-dry-run.mjs     # ...and exactly that one, for the right reason
+      - name: Live eval (only when the ANTHROPIC_API_KEY secret is set)
+        if: env.ANTHROPIC_API_KEY != ''
+        run: npm run eval
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: promptfoo-results
+          path: promptfoo/out/
+          retention-days: 14

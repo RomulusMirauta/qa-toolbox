@@ -1,0 +1,22 @@
+# Real run, 2026-11-18: docker compose -f docker/compose.yaml run --rm tests
+# Docker Desktop 29.2.1 (WSL 2) on Windows 11; image mcr.microsoft.com/playwright:v1.65.0-noble; suite main @ a87ed9e; WORKERS=2
+# Excerpt: the first and last lines of the test output (image pulls and the middle trimmed).
+
+Running 444 tests using 2 workers
+  ✓    1 [desktop-chromium] › e2e/a11y-matrix.spec.ts:88:7 › axe matrix › dark theme, keys off, 1920×1080 › display options open @a11y (2.8s)
+  ✓    2 [desktop-chromium] › e2e/a11y-matrix.spec.ts:84:7 › axe matrix › dark theme, keys off, 1920×1080 › every view @a11y (20.9s)
+  ✓    3 [desktop-chromium] › e2e/a11y-matrix.spec.ts:84:7 › axe matrix › light theme, keys on, 1920×1080 › every view @a11y (19.1s)
+  ✓    4 [desktop-chromium] › e2e/a11y-matrix.spec.ts:88:7 › axe matrix › light theme, keys on, 1920×1080 › display options open @a11y (2.2s)
+  ✓    6 [desktop-chromium] › e2e/a11y-matrix.spec.ts:88:7 › axe matrix › light theme, keys off, 1920×1080 › display options open @a11y (2.5s)
+  ✓    7 [desktop-chromium] › e2e/a11y-matrix.spec.ts:97:5 › axe matrix › light theme, 1920×1080 › intro overlay @a11y (2.2s)
+  ...
+  ✓  439 [phone-chromium] › e2e/privacy.spec.ts:36:3 › privacy: no phone number on the public pages › the app: HTML, JSON-LD and the visible text of every screen @all-devices @critical (4.5s)
+  ✓  443 [phone-chromium] › e2e/smoke.spec.ts:40:3 › smoke › loads as a visitor sees it, without console errors @smoke @all-devices (3.2s)
+  ✓  442 [phone-chromium] › e2e/scroll-areas.spec.ts:151:3 › touch screens: the cue sits under the columns that go on, clear of the CTA box › on the phone: every scroll area on every screen @m
+  ✓  444 [phone-chromium] › e2e/spec-card.spec.ts:190:3 › spec card on a phone › every card keeps its facts clear of the tag and inside the card, each project name whole @mobile (15.5s)
+  2 skipped
+  442 passed (18.7m)
+
+# Fast tier, same day: TEST_ARGS='--grep "@smoke|@critical"' docker compose -f docker/compose.yaml run --rm tests
+Running 76 tests using 2 workers
+  76 passed (2.2m)

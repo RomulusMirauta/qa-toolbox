@@ -1,0 +1,62 @@
+# Runs the public Playwright suite (github.com/RomulusMirauta/personal-web-page-tests) in the
+# official Playwright Docker image. One command, from the repo root:
+#
+#   docker compose -f docker/compose.yaml run --rm tests
+#
+# Knobs (environment variables, all optional):
+#   SUITE_REF   branch/tag/commit of the suite to clone          (default: main)
+#   BASE_URL    deployment under test                            (default: the production app)
+#   TEST_ARGS   extra Playwright arguments, e.g. "--grep @smoke" (default: the whole suite)
+#   WORKERS     parallel workers, kept low to be polite          (default: 2)
+#
+# The suite is cloned read-only into a throw-away volume; only the reports come back to docker/out/.
+name: qa-toolbox-playwright
+
+services:
+  fetch:
+    # Shallow, read-only clone of the public suite. Nothing is ever pushed from here.
+    image: alpine/git:v2.54.1
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >
+        rm -rf /suite/* /suite/.[!.]* 2>/dev/null;
+        git clone --quiet --depth 1 --branch "$${SUITE_REF:-main}" https://github.com/RomulusMirauta/personal-web-page-tests.git /suite &&
+        git -C /suite log -1 --format='suite at %h (%cs)'
+    environment:
+      SUITE_REF: ${SUITE_REF:-main}
+    volumes:
+      - suite:/suite
+
+  tests:
+    # Keep this tag equal to the suite's @playwright/test version (browsers are baked into the image).
+    image: mcr.microsoft.com/playwright:v1.65.0-noble
+    depends_on:
+      fetch:
+        condition: service_completed_successfully
+    working_dir: /suite
+    init: true
+    ipc: host # recommended by Playwright for Chromium in Docker
+    environment:
+      CI: "1"
+      BASE_URL: ${BASE_URL:-https://romulus-mirauta.vercel.app}
+      WORKERS: ${WORKERS:-2}
+      TEST_ARGS: ${TEST_ARGS:-}
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+      npm_config_update_notifier: "false"
+      npm_config_fund: "false"
+      npm_config_audit: "false"
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - >
+        npm ci --no-audit --no-fund --loglevel=error &&
+        eval "npx playwright test $${TEST_ARGS}";
+        status=$$?;
+        rm -rf /out/playwright-report /out/test-results;
+        cp -r playwright-report test-results /out/ 2>/dev/null;
+        exit $$status
+    volumes:
+      - suite:/suite
+      - ./out:/out
+
+volumes:
+  suite:
