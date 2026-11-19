@@ -1,0 +1,15 @@
+# Keeps the pinned versions current: one monthly pull request per ecosystem.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: monthly }
+  - package-ecosystem: npm
+    directory: /promptfoo
+    schedule: { interval: monthly }
+  - package-ecosystem: npm
+    directory: /test-agents
+    schedule: { interval: monthly }
+  - package-ecosystem: docker-compose
+    directory: /docker
+    schedule: { interval: monthly }

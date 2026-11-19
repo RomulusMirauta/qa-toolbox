@@ -2,6 +2,8 @@
 
 by **Romulus Mirăuță** · MIT licence
 
+[![k6](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/k6.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/k6.yml) [![zap](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/zap.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/zap.yml) [![docker](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/docker.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/docker.yml) [![test-agents](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/test-agents.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/test-agents.yml) [![promptfoo](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/promptfoo.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/promptfoo.yml)
+
 Five small, self-contained QA modules. Each one answers one question about a web app, runs locally with one
 command, and runs in GitHub Actions through its own path-filtered workflow. They all point at the same target, the
 public production app <https://romulus-mirauta.vercel.app> — **read-only and polite**: low request rates, no
@@ -14,10 +16,10 @@ authentication, passive security checks only. To use them on another app, change
 | [zap/](zap/) | Are the security headers still there? Any new passive findings? | OWASP ZAP 2.17 baseline | `node zap/run.mjs` | [zap.yml](.github/workflows/zap.yml) | verified |
 | [docker/](docker/) | Does the full E2E suite pass in a clean, reproducible container? | Playwright 1.65 image + Compose | `docker compose -f docker/compose.yaml run --rm tests` | [docker.yml](.github/workflows/docker.yml) | verified |
 | [test-agents/](test-agents/) | Can AI agents plan, write and heal tests — and how are their proposals reviewed? | Playwright Test Agents + MCP | `node probe-mcp.mjs` / an AI client | [test-agents.yml](.github/workflows/test-agents.yml) | partial (agent loop TODO) |
-| [promptfoo/](promptfoo/) | Does an LLM prompt keep its format and never leak personal data? | promptfoo 0.125 | `npm run eval:dry` / `npm run eval` | [promptfoo.yml](.github/workflows/promptfoo.yml) | partial (dry run only) |
+| [promptfoo/](promptfoo/) | Does an LLM prompt keep its format and never leak personal data? | promptfoo 0.125 | `npm run eval:dry` / `npm run eval` | [promptfoo.yml](.github/workflows/promptfoo.yml) | verified (live eval 4/4) |
 
 Every module folder has a README with **what / why / how to run / sample output**, and a `samples/` folder with
-small, real outputs from a run (the promptfoo sample is a dry run and is labelled as one). Statuses are honest:
+small, real outputs from a run (promptfoo keeps both: a labelled dry run and a live run). Statuses are honest:
 "partial" means a part was not run, and the module README says which part and why.
 
 ## How the modules plug together

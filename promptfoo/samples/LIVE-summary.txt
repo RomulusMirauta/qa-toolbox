@@ -1,0 +1,15 @@
+LIVE eval — claude-haiku-4-5, temperature 0 (GitHub Actions run 44428395822, 2026-11-19)
+
+[PASS] Hi, Jane Popescu here (jane.popescu@example.com, +1 202 555 0147). On …
+  -> {"title":"CV page skills table cut in half when printing to PDF","severity":"major","component":"CV page","steps":["Open /cv/","Press Ctrl+P to open print dialog","Select 'Save as PDF' option","Observe the output PDF"],"expected":"Skills ta
+
+[PASS] Keyboard users cannot open a skill category. Tab reaches the wheel seg…
+  -> {"title":"Keyboard users cannot open skill category","severity":"major","component":"skill category wheel","steps":["Open skill category wheel in Firefox 133 on macOS","Tab to a wheel segment","Press Enter on the focused segment","Attempt t
+
+[PASS] URGENT!!! after this morning's deploy the site shows a blank white pag…
+  -> {"title":"Blank white page on all browsers after deploy - ChunkLoadError","severity":"blocker","component":"Frontend","steps":["Deploy application","Open site in any browser","Observe page load"],"expected":"Site loads and displays content"
+
+[PASS] footer says "Experiance" instead of "Experience". that's it. …
+  -> {"title":"Footer displays misspelled word 'Experiance'","severity":"trivial","component":"Footer","steps":["Navigate to the footer of the page"],"expected":"Footer text reads 'Experience'","actual":"Footer text reads 'Experiance'"}
+
+Totals: 4 passed, 0 failed, 0 errors · 1749 provider tokens (plus the llm-rubric grader)

@@ -1,8 +1,9 @@
 # promptfoo — eval for a bug-report summariser prompt
 
-**Status: partial** — the harness is verified with a **dry run** (canned responses, no model). The live eval
-against a model has **not been run yet**: no working API key was available on the machine that built this module
-(the key found in the environment was rejected with HTTP 401). Nothing below is model output.
+**Status: verified** — live eval against `claude-haiku-4-5` in GitHub Actions: **4/4 passed** (format, severity band, no
+personal data, and an `llm-rubric` check for invented facts), plus the dry run (canned responses, no model) that
+proves the PII gate catches a planted leak. Samples: [`samples/LIVE-summary.txt`](samples/LIVE-summary.txt),
+[`samples/LIVE-results.html`](samples/LIVE-results.html).
 
 ## What
 
@@ -72,10 +73,12 @@ Totals: 3 passed, 1 failed, 0 errors
 
 Files: [`samples/DRY-RUN-summary.txt`](samples/DRY-RUN-summary.txt), [`samples/DRY-RUN-results.html`](samples/DRY-RUN-results.html).
 
-## TODO
+## What the first live run caught
 
-- [ ] Run `npm run eval` with a valid key, save a `samples/LIVE-*` result, and record how the model did on the
-      PII cases (and whether `llm-rubric` agreed with a human reading of the four outputs).
+The first live run failed **4/4** on `is-json`: the model wrapped every answer in a Markdown code block, although the
+prompt already said "no code fences". The rule sat in the middle of the prompt, before the bug report. Adding one
+closing line **after** the report ("the first character of your reply is { and the last is }; no Markdown code
+block") fixed it: **4/4 passed**. The check stayed strict; the prompt was fixed, not the assertion.
 
 ## A bug the harness found in itself
 
