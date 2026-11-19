@@ -16,3 +16,5 @@ Raw bug report:
 """
 {{report}}
 """
+
+Answer with the JSON object only: the first character of your reply is { and the last is }. Do not wrap it in a Markdown code block.
