@@ -19,7 +19,7 @@ code and dependencies, the other mounts UI components in a browser inside the ru
 | [test-agents/](test-agents/) | Can AI agents plan, write and heal tests — and how are their proposals reviewed? | Playwright Test Agents + MCP | `node probe-mcp.mjs` / an AI client | [test-agents.yml](.github/workflows/test-agents.yml) | partial (agent loop TODO) |
 | [promptfoo/](promptfoo/) | Does an LLM prompt keep its format and never leak personal data? | promptfoo 0.125 | `npm run eval:dry` / `npm run eval` | [promptfoo.yml](.github/workflows/promptfoo.yml) | verified (live eval 4/4) |
 | [dependency-scanning/](dependency-scanning/) | Do our dependencies or our code carry known vulnerabilities? | npm audit, Semgrep 1.186, Snyk | `npm ci && npm run audit` | [dependency-scanning.yml](.github/workflows/dependency-scanning.yml) | verified |
-| [cypress-component/](cypress-component/) | Does a UI component render, validate, stay accessible and call back correctly — in isolation? | Cypress 16.3 component testing (React + Vite) | `npm ci && npm run test:component` | [cypress-component.yml](.github/workflows/cypress-component.yml) | verified (10/10 locally) |
+| [cypress-component/](cypress-component/) | Does a UI component render, validate, stay accessible and call back correctly — in isolation? | Cypress 16.3 component testing (React + Vite) | `npm ci && npm run test:component` | [cypress-component.yml](.github/workflows/cypress-component.yml) | verified |
 
 Every module folder has a README with **what / why / how to run / sample output**, and a `samples/` folder with
 small, real outputs from a run (promptfoo keeps both: a labeled dry run and a live run). Statuses are honest:

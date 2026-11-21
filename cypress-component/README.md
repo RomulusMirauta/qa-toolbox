@@ -1,6 +1,6 @@
 # cypress-component — React components tested in isolation with Cypress
 
-**Status: verified** — locally on 2026-11-21: 10/10 component tests pass (Cypress 16.3, headless Electron; Node 26,
+**Status: verified** — in CI (Ubuntu, Node 24) and locally on 2026-11-21: 10/10 component tests pass (Cypress 16.3, headless Electron; Node 26,
 Windows 11). A deliberately broken build (the title no longer trimmed) fails the gate with exactly one red test and a
 screenshot. CI: [`cypress-component.yml`](../.github/workflows/cypress-component.yml), first run on the push of this module.
 
