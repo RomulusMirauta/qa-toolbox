@@ -17,7 +17,7 @@ authentication, passive security checks only. To use them on another app, change
 | [docker/](docker/) | Does the full E2E suite pass in a clean, reproducible container? | Playwright 1.65 image + Compose | `docker compose -f docker/compose.yaml run --rm tests` | [docker.yml](.github/workflows/docker.yml) | verified |
 | [test-agents/](test-agents/) | Can AI agents plan, write and heal tests — and how are their proposals reviewed? | Playwright Test Agents + MCP | `node probe-mcp.mjs` / an AI client | [test-agents.yml](.github/workflows/test-agents.yml) | partial (agent loop TODO) |
 | [promptfoo/](promptfoo/) | Does an LLM prompt keep its format and never leak personal data? | promptfoo 0.125 | `npm run eval:dry` / `npm run eval` | [promptfoo.yml](.github/workflows/promptfoo.yml) | verified (live eval 4/4) |
-| [dependency-scanning/](dependency-scanning/) | Do our dependencies or our code carry known vulnerabilities? | npm audit, Semgrep 1.186, Snyk | `npm ci && npm run audit` | [dependency-scanning.yml](.github/workflows/dependency-scanning.yml) | partial (Snyk needs a token) |
+| [dependency-scanning/](dependency-scanning/) | Do our dependencies or our code carry known vulnerabilities? | npm audit, Semgrep 1.186, Snyk | `npm ci && npm run audit` | [dependency-scanning.yml](.github/workflows/dependency-scanning.yml) | verified |
 
 Every module folder has a README with **what / why / how to run / sample output**, and a `samples/` folder with
 small, real outputs from a run (promptfoo keeps both: a labelled dry run and a live run). Statuses are honest:

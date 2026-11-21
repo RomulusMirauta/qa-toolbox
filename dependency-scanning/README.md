@@ -1,8 +1,8 @@
 # dependency-scanning — npm audit, Semgrep and Snyk as a CI gate
 
-**Status: partial** — npm audit and the unit tests verified locally (npm 12.2, Node 26, Windows 11): 0 advisories,
-3/3 tests. Semgrep was not run locally (no local install; CI runs the pinned image). Snyk runs in CI once the
-`SNYK_TOKEN` repository secret is added; until then its job skips with a notice.
+**Status: verified** — in CI on 2026-11-21: npm audit 0 advisories, unit tests 3/3, Semgrep 0 findings, Snyk Open
+Source 0 issues and Snyk Code 0 issues (the module's own source; `.snyk` keeps installed packages out of the code scan).
+Locally: npm audit and the tests (npm 12.2, Node 26, Windows 11); Semgrep and Snyk run only in CI.
 
 ## What
 
