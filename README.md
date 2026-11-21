@@ -1,14 +1,14 @@
 # QA toolbox — small, modular, reusable proofs
 
-by **Romulus Mirăuță** · MIT licence
+by **Romulus Mirăuță** · MIT license
 
-[![k6](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/k6.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/k6.yml) [![zap](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/zap.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/zap.yml) [![docker](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/docker.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/docker.yml) [![test-agents](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/test-agents.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/test-agents.yml) [![promptfoo](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/promptfoo.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/promptfoo.yml)
+[![k6](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/k6.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/k6.yml) [![zap](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/zap.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/zap.yml) [![docker](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/docker.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/docker.yml) [![test-agents](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/test-agents.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/test-agents.yml) [![promptfoo](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/promptfoo.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/promptfoo.yml) [![dependency-scanning](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/dependency-scanning.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/dependency-scanning.yml)
 
-Five small, self-contained QA modules. Each one answers one question about a web app, runs locally with one
-command, and runs in GitHub Actions through its own path-filtered workflow. They all point at the same target, the
-public production app <https://romulus-mirauta.vercel.app> — **read-only and polite**: low request rates, no
+Six small, self-contained QA modules. Each one answers one question about a web app, runs locally with one
+command, and runs in GitHub Actions through its own path-filtered workflow. The runtime modules point at the same
+target, the public production app <https://romulus-mirauta.vercel.app> — **read-only and polite**: low request rates, no
 authentication, passive security checks only. To use them on another app, change one URL (each module takes
-`BASE_URL`, `TARGET_URL` or an argument).
+`BASE_URL`, `TARGET_URL` or an argument). `dependency-scanning/` needs no target: it scans code and dependencies.
 
 | module | question it answers | tool | local command | CI workflow | status |
 | --- | --- | --- | --- | --- | --- |
@@ -17,6 +17,7 @@ authentication, passive security checks only. To use them on another app, change
 | [docker/](docker/) | Does the full E2E suite pass in a clean, reproducible container? | Playwright 1.65 image + Compose | `docker compose -f docker/compose.yaml run --rm tests` | [docker.yml](.github/workflows/docker.yml) | verified |
 | [test-agents/](test-agents/) | Can AI agents plan, write and heal tests — and how are their proposals reviewed? | Playwright Test Agents + MCP | `node probe-mcp.mjs` / an AI client | [test-agents.yml](.github/workflows/test-agents.yml) | partial (agent loop TODO) |
 | [promptfoo/](promptfoo/) | Does an LLM prompt keep its format and never leak personal data? | promptfoo 0.125 | `npm run eval:dry` / `npm run eval` | [promptfoo.yml](.github/workflows/promptfoo.yml) | verified (live eval 4/4) |
+| [dependency-scanning/](dependency-scanning/) | Do our dependencies or our code carry known vulnerabilities? | npm audit, Semgrep 1.186, Snyk | `npm ci && npm run audit` | [dependency-scanning.yml](.github/workflows/dependency-scanning.yml) | partial (Snyk needs a token) |
 
 Every module folder has a README with **what / why / how to run / sample output**, and a `samples/` folder with
 small, real outputs from a run (promptfoo keeps both: a labelled dry run and a live run). Statuses are honest:
@@ -34,6 +35,8 @@ flowchart LR
   D --> Z[zap/: passive baseline<br>security headers]
   A[test-agents/: AI-assisted<br>test authoring] -. reviewed tests .-> S
   P[promptfoo/: prompt evals] -. for LLM features .-> R
+  C[commit / PR] --> V[dependency-scanning/:<br>npm audit + Semgrep + Snyk]
+  V --> R
   S --> R{release gate}
   K --> R
   Z --> R
@@ -45,12 +48,15 @@ flowchart LR
   `<module>/out/`, and every workflow uploads them as an artifact.
 - **Authoring vs. gating.** `test-agents/` produces tests (after human review) that end up in the suite `docker/`
   runs; `promptfoo/` gates prompts the way the suite gates UI changes.
+- **Before the deploy.** `dependency-scanning/` gates the commit itself (dependencies and source, SARIF into code
+  scanning) and re-runs weekly, because new advisories appear while the code stands still. Dependabot keeps every
+  module's pinned versions current with one monthly pull request per ecosystem.
 
 ## Running everything locally
 
 | need | for | install (Windows) |
 | --- | --- | --- |
-| Node 24 | zap, test-agents, promptfoo | `winget install OpenJS.NodeJS.LTS` |
+| Node 24 | zap, test-agents, promptfoo, dependency-scanning | `winget install OpenJS.NodeJS.LTS` |
 | k6 | k6 | `winget install GrafanaLabs.k6` |
 | Docker Desktop | zap, docker | `winget install Docker.DockerDesktop` (needs WSL 2) |
 
@@ -60,6 +66,7 @@ node zap/run.mjs
 docker compose -f docker/compose.yaml run --rm tests
 (cd test-agents && npm ci && npx playwright install chromium && npx playwright test && node probe-mcp.mjs)
 (cd promptfoo && npm install && npm run eval:dry; node check-dry-run.mjs)
+(cd dependency-scanning && npm ci && npm test && npm run audit:summary && npm run audit)
 ```
 
 ## Ground rules
@@ -72,6 +79,6 @@ docker compose -f docker/compose.yaml run --rm tests
 - **Pinned tools.** GitHub Actions are pinned to a commit SHA (with the version in a comment), Docker images to an
   exact version tag, npm packages to exact versions.
 
-## Licence
+## License
 
 [MIT](LICENSE) © 2026 Romulus Mirăuță

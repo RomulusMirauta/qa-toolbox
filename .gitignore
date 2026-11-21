@@ -10,6 +10,7 @@ docker/*.log
 promptfoo/out/
 test-agents/playwright-report/
 test-agents/test-results/
+dependency-scanning/out/
 
 # secrets: never commit keys
 .env

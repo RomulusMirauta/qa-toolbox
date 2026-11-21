@@ -1,0 +1,19 @@
+{
+  "name": "qa-toolbox-dependency-scanning",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A tiny Node project that npm audit, Semgrep and Snyk scan in CI: dependency and code scanning as a gate.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "node --test",
+    "audit": "npm audit --audit-level=high",
+    "audit:summary": "node audit-summary.mjs"
+  },
+  "dependencies": {
+    "zod": "4.6.7"
+  }
+}

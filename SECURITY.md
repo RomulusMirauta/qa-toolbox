@@ -12,4 +12,5 @@ instead of opening a public issue. I aim to reply within a week.
 ## Scope
 
 - Please do not run active or high-rate scans against the app.
-- Secrets are never committed: the only key (for the live promptfoo eval) lives in a GitHub Actions secret.
+- Secrets are never committed: the only keys (for the live promptfoo eval and for Snyk in `dependency-scanning/`)
+  live in GitHub Actions secrets.

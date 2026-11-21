@@ -10,6 +10,9 @@ updates:
   - package-ecosystem: npm
     directory: /test-agents
     schedule: { interval: monthly }
+  - package-ecosystem: npm
+    directory: /dependency-scanning
+    schedule: { interval: monthly }
   - package-ecosystem: docker-compose
     directory: /docker
     schedule: { interval: monthly }

@@ -1,0 +1,156 @@
+name: Dependency and code scanning
+
+on:
+  push:
+    paths: ['dependency-scanning/**', '.github/workflows/dependency-scanning.yml']
+  pull_request:
+    paths: ['dependency-scanning/**', '.github/workflows/dependency-scanning.yml']
+  workflow_dispatch:
+  schedule:
+    # Weekly, Monday 05:23 UTC: new advisories appear even when the code does not change.
+    - cron: '23 5 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dependency-scanning-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  npm-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: dependency-scanning
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: dependency-scanning/package-lock.json
+      - run: npm ci --no-fund
+      - run: npm test
+      - name: Summary (every severity, written to the job summary)
+        run: npm run --silent audit:summary
+      - name: Gate (fails on high or critical advisories)
+        run: npm audit --audit-level=high
+      - name: Upload the audit report
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: npm-audit
+          path: dependency-scanning/out/
+          retention-days: 14
+
+  semgrep:
+    # Semgrep OSS (Community Edition) with public registry rulesets: no Semgrep account or token needed.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write # upload SARIF to code scanning
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Scan with the pinned Semgrep image (fails on any finding)
+        run: |
+          mkdir -p dependency-scanning/out && chmod a+rwx dependency-scanning/out
+          docker run --rm -v "$PWD:/src" -w /src semgrep/semgrep:1.186.0 \
+            semgrep scan \
+              --config p/javascript --config p/typescript --config p/secrets \
+              --metrics=off --error \
+              --sarif-output=dependency-scanning/out/semgrep.sarif \
+              dependency-scanning
+      - name: Summary
+        if: always()
+        run: node dependency-scanning/sarif-summary.mjs "Semgrep" dependency-scanning/out/semgrep.sarif
+      - name: Upload SARIF to code scanning
+        # Fork PRs get a read-only token, so they skip the upload; the scan above still gates them.
+        if: >-
+          always() && hashFiles('dependency-scanning/out/semgrep.sarif') != '' &&
+          (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        uses: github/codeql-action/upload-sarif@1bd86f2fdb4b86187fa4059f16f31a3202acc9ea # v4.39.4
+        with:
+          sarif_file: dependency-scanning/out/semgrep.sarif
+          category: semgrep
+      - name: Upload the SARIF as an artifact
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: semgrep-sarif
+          path: dependency-scanning/out/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  snyk:
+    # Runs only when the SNYK_TOKEN repository secret exists (never on forks); otherwise it skips with a notice.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write # upload SARIF to code scanning
+    env:
+      # Only from repository secrets; never written to a file. Empty on forks and when not configured.
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+    steps:
+      - name: No SNYK_TOKEN secret, skipping Snyk
+        if: env.SNYK_TOKEN == ''
+        run: |
+          echo "::notice title=Snyk skipped::The SNYK_TOKEN secret is not set (or this is a fork PR). npm audit and Semgrep still ran."
+          echo "## Snyk" >> "$GITHUB_STEP_SUMMARY"
+          echo "Skipped: the \`SNYK_TOKEN\` secret is not set (or this is a fork PR)." >> "$GITHUB_STEP_SUMMARY"
+      - if: env.SNYK_TOKEN != ''
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - if: env.SNYK_TOKEN != ''
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: dependency-scanning/package-lock.json
+      - if: env.SNYK_TOKEN != ''
+        run: npm ci --no-fund && mkdir -p out && chmod a+rwx out
+        working-directory: dependency-scanning
+      - name: Snyk Open Source (dependencies; fails on high or critical)
+        if: env.SNYK_TOKEN != ''
+        uses: snyk/actions/node@9adf32b1121593767fc3c057af55b55db032dc04 # v1.0.0
+        with:
+          command: test
+          args: >-
+            --file=dependency-scanning/package-lock.json
+            --severity-threshold=high
+            --sarif-file-output=dependency-scanning/out/snyk-open-source.sarif
+      - name: Snyk Code (source; informational, needs Snyk Code enabled in the Snyk org)
+        if: always() && env.SNYK_TOKEN != ''
+        continue-on-error: true
+        uses: snyk/actions/node@9adf32b1121593767fc3c057af55b55db032dc04 # v1.0.0
+        with:
+          command: code test
+          args: >-
+            dependency-scanning
+            --severity-threshold=high
+            --sarif-file-output=dependency-scanning/out/snyk-code.sarif
+      - name: Summary
+        if: always() && env.SNYK_TOKEN != ''
+        run: node dependency-scanning/sarif-summary.mjs "Snyk" dependency-scanning/out/snyk-open-source.sarif dependency-scanning/out/snyk-code.sarif
+      - name: Upload Snyk Open Source SARIF
+        if: always() && env.SNYK_TOKEN != '' && hashFiles('dependency-scanning/out/snyk-open-source.sarif') != ''
+        uses: github/codeql-action/upload-sarif@1bd86f2fdb4b86187fa4059f16f31a3202acc9ea # v4.39.4
+        with:
+          sarif_file: dependency-scanning/out/snyk-open-source.sarif
+          category: snyk-open-source
+      - name: Upload Snyk Code SARIF
+        if: always() && env.SNYK_TOKEN != '' && hashFiles('dependency-scanning/out/snyk-code.sarif') != ''
+        uses: github/codeql-action/upload-sarif@1bd86f2fdb4b86187fa4059f16f31a3202acc9ea # v4.39.4
+        with:
+          sarif_file: dependency-scanning/out/snyk-code.sarif
+          category: snyk-code
+      - name: Upload the SARIF files as an artifact
+        if: always() && env.SNYK_TOKEN != ''
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: snyk-sarif
+          path: dependency-scanning/out/*.sarif
+          if-no-files-found: ignore
+          retention-days: 14
