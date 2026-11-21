@@ -1,0 +1,7 @@
+# Snyk policy file: Snyk Code scans this module's own source, not the installed packages
+# (npm ci in CI puts node_modules here; third-party code is covered by npm audit and Snyk Open Source).
+version: v1.25.1
+exclude:
+  global:
+    - node_modules/**
+    - out/**
