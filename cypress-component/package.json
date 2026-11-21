@@ -1,0 +1,25 @@
+{
+  "name": "qa-toolbox-cypress-component",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cypress component tests for two small React components: a bug-report form and a severity badge.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test:component": "cypress run --component",
+    "test:summary": "node run.mjs",
+    "cy:open": "cypress open --component"
+  },
+  "dependencies": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "6.3.0",
+    "cypress": "16.3.0",
+    "vite": "8.3.8"
+  }
+}

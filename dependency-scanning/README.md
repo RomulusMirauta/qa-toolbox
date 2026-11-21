@@ -18,7 +18,7 @@ committed `package-lock.json`. Three scanners read it on every change and once a
 | **Snyk Code** | the source code (Snyk's own SAST engine) | nothing: informational, `continue-on-error` | job summary + SARIF (category `snyk-code`) |
 
 **Dependabot** covers the rest: [`.github/dependabot.yml`](../.github/dependabot.yml) opens one monthly pull request
-per ecosystem (npm in this folder, `promptfoo/` and `test-agents/`; the pinned GitHub Actions; the Docker Compose
+per ecosystem (npm in this folder, `promptfoo/`, `test-agents/` and `cypress-component/`; the pinned GitHub Actions; the Docker Compose
 image), and each of those pull requests runs this workflow again. Dependabot alerts (security advisories for the
 dependency graph) are a repository setting, independent of the version-update file.
 

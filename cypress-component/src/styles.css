@@ -1,0 +1,21 @@
+:root {
+  --fg: #1b1f24;
+  --muted: #57606a;
+  --error: #b42318;
+  --focus: #0b5fff;
+  font-family: system-ui, sans-serif;
+  color: var(--fg);
+}
+.bug-form { display: grid; gap: 0.35rem; max-width: 32rem; padding: 1rem; }
+.bug-form label { font-weight: 600; margin-top: 0.5rem; }
+.bug-form input, .bug-form textarea, .bug-form select { font: inherit; padding: 0.4rem; }
+.bug-form [aria-invalid='true'] { border: 2px solid var(--error); }
+.bug-form :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.bug-form button { margin-top: 0.75rem; padding: 0.5rem 1rem; font: inherit; justify-self: start; }
+.error { color: var(--error); margin: 0; }
+.status { color: var(--muted); min-height: 1.5em; }
+.badge { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600; color: #fff; }
+.badge--critical { background: #7a1010; }
+.badge--high { background: #b42318; }
+.badge--medium { background: #8a5a00; }
+.badge--low { background: #2f6b2f; }

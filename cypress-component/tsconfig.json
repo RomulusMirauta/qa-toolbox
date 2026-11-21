@@ -1,0 +1,14 @@
+{
+  "//": "Editor support only: Vite transpiles the .tsx files for Cypress; there is no separate type-check step.",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "types": ["cypress"]
+  },
+  "include": ["src", "cypress"]
+}

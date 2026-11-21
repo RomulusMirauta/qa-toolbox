@@ -2,13 +2,14 @@
 
 by **Romulus Mirăuță** · MIT license
 
-[![k6](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/k6.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/k6.yml) [![zap](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/zap.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/zap.yml) [![docker](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/docker.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/docker.yml) [![test-agents](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/test-agents.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/test-agents.yml) [![promptfoo](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/promptfoo.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/promptfoo.yml) [![dependency-scanning](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/dependency-scanning.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/dependency-scanning.yml)
+[![k6](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/k6.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/k6.yml) [![zap](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/zap.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/zap.yml) [![docker](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/docker.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/docker.yml) [![test-agents](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/test-agents.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/test-agents.yml) [![promptfoo](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/promptfoo.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/promptfoo.yml) [![dependency-scanning](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/dependency-scanning.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/dependency-scanning.yml) [![cypress-component](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/cypress-component.yml/badge.svg)](https://github.com/RomulusMirauta/qa-toolbox/actions/workflows/cypress-component.yml)
 
-Six small, self-contained QA modules. Each one answers one question about a web app, runs locally with one
+Seven small, self-contained QA modules. Each one answers one question about a web app, runs locally with one
 command, and runs in GitHub Actions through its own path-filtered workflow. The runtime modules point at the same
 target, the public production app <https://romulus-mirauta.vercel.app> — **read-only and polite**: low request rates, no
 authentication, passive security checks only. To use them on another app, change one URL (each module takes
-`BASE_URL`, `TARGET_URL` or an argument). `dependency-scanning/` needs no target: it scans code and dependencies.
+`BASE_URL`, `TARGET_URL` or an argument). `dependency-scanning/` and `cypress-component/` need no target: one scans
+code and dependencies, the other mounts UI components in a browser inside the runner.
 
 | module | question it answers | tool | local command | CI workflow | status |
 | --- | --- | --- | --- | --- | --- |
@@ -18,9 +19,10 @@ authentication, passive security checks only. To use them on another app, change
 | [test-agents/](test-agents/) | Can AI agents plan, write and heal tests — and how are their proposals reviewed? | Playwright Test Agents + MCP | `node probe-mcp.mjs` / an AI client | [test-agents.yml](.github/workflows/test-agents.yml) | partial (agent loop TODO) |
 | [promptfoo/](promptfoo/) | Does an LLM prompt keep its format and never leak personal data? | promptfoo 0.125 | `npm run eval:dry` / `npm run eval` | [promptfoo.yml](.github/workflows/promptfoo.yml) | verified (live eval 4/4) |
 | [dependency-scanning/](dependency-scanning/) | Do our dependencies or our code carry known vulnerabilities? | npm audit, Semgrep 1.186, Snyk | `npm ci && npm run audit` | [dependency-scanning.yml](.github/workflows/dependency-scanning.yml) | verified |
+| [cypress-component/](cypress-component/) | Does a UI component render, validate, stay accessible and call back correctly — in isolation? | Cypress 16.3 component testing (React + Vite) | `npm ci && npm run test:component` | [cypress-component.yml](.github/workflows/cypress-component.yml) | verified (10/10 locally) |
 
 Every module folder has a README with **what / why / how to run / sample output**, and a `samples/` folder with
-small, real outputs from a run (promptfoo keeps both: a labelled dry run and a live run). Statuses are honest:
+small, real outputs from a run (promptfoo keeps both: a labeled dry run and a live run). Statuses are honest:
 "partial" means a part was not run, and the module README says which part and why.
 
 ## How the modules plug together
@@ -36,7 +38,9 @@ flowchart LR
   A[test-agents/: AI-assisted<br>test authoring] -. reviewed tests .-> S
   P[promptfoo/: prompt evals] -. for LLM features .-> R
   C[commit / PR] --> V[dependency-scanning/:<br>npm audit + Semgrep + Snyk]
+  C --> U[cypress-component/:<br>components in isolation]
   V --> R
+  U --> R
   S --> R{release gate}
   K --> R
   Z --> R
@@ -51,12 +55,14 @@ flowchart LR
 - **Before the deploy.** `dependency-scanning/` gates the commit itself (dependencies and source, SARIF into code
   scanning) and re-runs weekly, because new advisories appear while the code stands still. Dependabot keeps every
   module's pinned versions current with one monthly pull request per ecosystem.
+- **Fast feedback first.** `cypress-component/` tests single components on the commit, before any deployment
+  exists: seconds per run, no network, no target app — the cheap layer below the E2E suite.
 
 ## Running everything locally
 
 | need | for | install (Windows) |
 | --- | --- | --- |
-| Node 24 | zap, test-agents, promptfoo, dependency-scanning | `winget install OpenJS.NodeJS.LTS` |
+| Node 24 | zap, test-agents, promptfoo, dependency-scanning, cypress-component | `winget install OpenJS.NodeJS.LTS` |
 | k6 | k6 | `winget install GrafanaLabs.k6` |
 | Docker Desktop | zap, docker | `winget install Docker.DockerDesktop` (needs WSL 2) |
 
@@ -67,6 +73,7 @@ docker compose -f docker/compose.yaml run --rm tests
 (cd test-agents && npm ci && npx playwright install chromium && npx playwright test && node probe-mcp.mjs)
 (cd promptfoo && npm install && npm run eval:dry; node check-dry-run.mjs)
 (cd dependency-scanning && npm ci && npm test && npm run audit:summary && npm run audit)
+(cd cypress-component && npm ci && npx cypress install && npm run test:summary)
 ```
 
 ## Ground rules

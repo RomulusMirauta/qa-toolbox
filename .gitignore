@@ -11,6 +11,8 @@ promptfoo/out/
 test-agents/playwright-report/
 test-agents/test-results/
 dependency-scanning/out/
+cypress-component/out/
+cypress-component/cypress/downloads/
 
 # secrets: never commit keys
 .env
